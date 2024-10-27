@@ -14,17 +14,6 @@ router.get('/random', async (req, res) => {
     }
 });
 
-// Route to get 5 random programs for the dashboard
-router.get('/dashboard', async (req, res) => {
-    try {
-        const programs = await knex('programs').orderByRaw('RAND()').limit(5); // Use RAND() for MySQL
-        res.status(200).json(programs);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'An error occurred', details: error.message });
-    }
-});
-
 export default router;
 
 
