@@ -9,12 +9,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const handleError = (res, error) => {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+// Error image mappings
+const errorImages = {
+    400: 'https://http.dog/400.jpg',
+    404: 'https://http.dog/404.jpg',
+    500: 'https://http.dog/500.jpg',
 };
 
-// Route to get organizations
+const handleError = (res, error, statusCode = 500) => {
+    console.error(error);
+    const imageUrl = errorImages[statusCode] || 'https://http.dog/unknown.jpg';
+    res.status(statusCode).json({ 
+        error: 'An error occurred', 
+        details: error.message,
+        image: imageUrl 
+    });
+};
+
 app.get('/organizations', async (req, res) => {
     try {
         const rows = await knex('organizations').select('*');
@@ -24,17 +35,16 @@ app.get('/organizations', async (req, res) => {
     }
 });
 
-// Route to get programs with optional location filter
 app.get('/programs', async (req, res) => {
     const location = req.query.location;
     if (!location) {
-        return res.status(400).json({ error: 'Location parameter is required.' });
+        return handleError(res, new Error('Location parameter is required.'), 400);
     }
 
     try {
         const programs = await knex('programs').where('location', 'like', `%${location}%`);
         if (programs.length === 0) {
-            return res.status(404).json({ message: 'No programs found.' });
+            return handleError(res, new Error('No programs found.'), 404);
         }
         res.json(programs);
     } catch (error) {
@@ -42,12 +52,11 @@ app.get('/programs', async (req, res) => {
     }
 });
 
-// Route to add a new organization
 app.put('/organizations', async (req, res) => {
     const { organization, acronym, contactTitle, contactNumber, contactEmail, webLink, logo, area } = req.body;
 
     if (!organization || !acronym || !contactTitle || !contactNumber || !contactEmail || !webLink || !logo || !area) {
-        return res.status(400).json({ error: 'All fields are required' });
+        return handleError(res, new Error('All fields are required'), 400);
     }
 
     try {
@@ -58,12 +67,11 @@ app.put('/organizations', async (req, res) => {
     }
 });
 
-// Route to add a program suggestion
 app.post('/api/suggestions', async (req, res) => {
     const { programName, institutionName, location, message } = req.body;
 
     if (!programName || !institutionName || !location || !message) {
-        return res.status(400).json({ error: 'All fields are required' });
+        return handleError(res, new Error('All fields are required'), 400);
     }
 
     try {
@@ -74,7 +82,6 @@ app.post('/api/suggestions', async (req, res) => {
     }
 });
 
-// Route to retrieve all program suggestions
 app.get('/api/suggestions', async (req, res) => {
     try {
         const suggestions = await knex('suggestions').select('*');
@@ -84,7 +91,6 @@ app.get('/api/suggestions', async (req, res) => {
     }
 });
 
-// Start the server
 app.listen(PORT, () => {
     console.log(`Server listening at PORT ${PORT}`);
 });
