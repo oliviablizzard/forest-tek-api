@@ -3,20 +3,27 @@ import knex from '../knex.js';
 
 const router = express.Router();
 
-// Route to get 5 random programs
+// Route to get 5 random programs, including province
 router.get('/random', async (req, res) => {
     try {
-        const programs = await knex('programs').orderByRaw('RAND()').limit(5); // Use RAND() for MySQL
+        const programs = await knex('programs')
+            .select('id', 'program_name', 'institution_name', 'program_level', 'province') // Include id column
+            .orderByRaw('RAND()')
+            .limit(5);
+        
+        // Check if programs were found
+        if (programs.length === 0) {
+            return res.status(404).json({ message: 'No programs found' });
+        }
+        
         res.status(200).json(programs);
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching random programs:', error);
         res.status(500).json({ error: 'An error occurred', details: error.message });
     }
 });
 
 export default router;
-
-
 
 
 
