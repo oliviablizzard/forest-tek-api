@@ -4,6 +4,8 @@ import cors from 'cors';
 import organizationsRouter from './routes/organizations.js';
 import programsRouter from './routes/programs.js';
 import suggestionsRouter from './routes/suggestions.js';
+import toolsRouter from './routes/tools.js';
+
 
 const { PORT } = process.env;
 const app = express();
@@ -15,6 +17,7 @@ app.use(express.json());
 app.use('/organizations', organizationsRouter);
 app.use('/programs', programsRouter);
 app.use('/api/suggestions', suggestionsRouter);
+app.use('/tools', toolsRouter);
 
 app.listen(PORT, () => {
     console.log(`Server listening at PORT ${PORT}`);
