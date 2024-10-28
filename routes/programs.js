@@ -3,6 +3,18 @@ import knex from '../knex.js';
 
 const router = express.Router();
 
+// Route to get all programs for mapping purposes
+router.get('/', async (req, res) => {
+    try {
+        const programs = await knex('programs')
+            .select('id', 'program_name', 'province', 'url'); // Add URL or coordinates as needed
+        res.status(200).json(programs);
+    } catch (error) {
+        console.error('Error fetching programs:', error);
+        res.status(500).json({ error: 'An error occurred while fetching programs' });
+    }
+});
+
 // Route to get 5 random programs, including province
 router.get('/random', async (req, res) => {
     try {

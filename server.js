@@ -16,7 +16,7 @@ app.use(express.json());
 // Use the routers
 app.use('/organizations', organizationsRouter);
 app.use('/programs', programsRouter);
-app.use('/api/suggestions', suggestionsRouter);
+app.use('/suggestions', suggestionsRouter);
 app.use('/tools', toolsRouter);
 
 app.listen(PORT, () => {
