@@ -1,5 +1,5 @@
 import express from 'express';
-import knex from '../knex.js';
+import knex from '../junk/knex.js';
 
 const router = express.Router();
 
