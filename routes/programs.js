@@ -3,35 +3,51 @@ import knex from '../knex.js';
 
 const router = express.Router();
 
-// Route to get all programs for mapping purposes
-router.get('/', async (req, res) => {
+// Route to get programs filtered by province and search query
+router.get('/', async (req, res, next) => {
+    const { province, query } = req.query; // Destructure query parameters
+
     try {
-        const programs = await knex('programs')
-            .select('id', 'program_name', 'province', 'url'); // Add URL or coordinates as needed
+        // Start building the query
+        let queryBuilder = knex('programs').select('id', 'institution_name', 'program_name', 'program_level', 'url', 'province');
+
+        // Filter by province if provided
+        if (province) {
+            queryBuilder = queryBuilder.where('province', province);
+        }
+
+        // Filter by program name if a search query is provided
+        if (query) {
+            queryBuilder = queryBuilder.where('program_name', 'like', `%${query}%`);
+        }
+
+        // Execute the query
+        const programs = await queryBuilder;
+
+        // Return the results
         res.status(200).json(programs);
     } catch (error) {
         console.error('Error fetching programs:', error);
-        res.status(500).json({ error: 'An error occurred while fetching programs' });
+        next(error); // Pass error to centralized error handler
     }
 });
 
-// Route to get 5 random programs, including province
-router.get('/random', async (req, res) => {
+// Route to get 5 random programs
+router.get('/random', async (req, res, next) => {
     try {
         const programs = await knex('programs')
-            .select('id', 'program_name', 'institution_name', 'program_level', 'province') // Include id column
+            .select('id', 'program_name', 'institution_name', 'program_level', 'province')
             .orderByRaw('RAND()')
             .limit(5);
         
-        // Check if programs were found
-        if (programs.length === 0) {
+        if (!programs.length) {
             return res.status(404).json({ message: 'No programs found' });
         }
-        
+
         res.status(200).json(programs);
     } catch (error) {
         console.error('Error fetching random programs:', error);
-        res.status(500).json({ error: 'An error occurred', details: error.message });
+        next(error);
     }
 });
 
