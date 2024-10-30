@@ -1,9 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 import programRoutes from './routes/programRoutes.js';
 
 const app = express();
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Routes
