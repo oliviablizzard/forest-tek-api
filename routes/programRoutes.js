@@ -1,8 +1,9 @@
 import express from 'express';
+import { getPrograms } from '../controllers/programController.js';
+
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.send('List of programs');
-});
+// Route to get programs, with optional province filter
+router.get('/', getPrograms);
 
 export default router;

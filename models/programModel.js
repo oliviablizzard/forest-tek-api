@@ -1,6 +1,20 @@
-const db = require('../db/db');
+import db from '../db/db.js';
 
-const getAllPrograms = () => db('programs').select('*');
-const getProgramById = (id) => db('programs').where({ id }).first();
+// fetch default list of programs 
+const getDefaultPrograms = (limit = 3) => {
+    return db('programs')
+        .select('id', 'url', 'program_name', 'institution_name', 'province')
+        .limit(limit);
+};
 
-module.exports = { getAllPrograms, getProgramById };
+// fetch programs filtered by province
+const getProgramsByProvince = (province) => {
+    return db('programs')
+        .select('id', 'url', 'program_name', 'institution_name', 'province')
+        .where('province', province);
+};
+
+export default {
+    getDefaultPrograms,
+    getProgramsByProvince,
+};

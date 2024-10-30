@@ -1,10 +1,16 @@
-const programModel = require('../models/programModel');
+import programModel from '../models/programModel.js';
 
-exports.getAllPrograms = async (req, res) => {
+export const getPrograms = async (req, res) => {
     try {
-        const programs = await programModel.getAllPrograms();
+        const { province } = req.query;
+
+        const programs = province
+        ? await programModel.getProgramsByProvince(province)
+        : await programModel.getDefaultPrograms();
+
         res.status(200).json(programs);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching programs' });
+        console.error("Error fetching programs:", error);
+        res.status(500).json({ message: "Error fetching programs" });
     }
 };
