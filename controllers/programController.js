@@ -4,9 +4,12 @@ export const getPrograms = async (req, res) => {
     try {
         const { province } = req.query;
 
-        const programs = province
-        ? await programModel.getProgramsByProvince(province)
-        : await programModel.getDefaultPrograms();
+        let programs;
+        if (province) {
+            programs = await programModel.getProgramsByProvince(province);
+        } else {
+            programs = await programModel.getDefaultPrograms();
+        };
 
         res.status(200).json(programs);
     } catch (error) {
