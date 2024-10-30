@@ -1,9 +1,8 @@
-const express = require('express');
-const programController = require('../controllers/programController');
-
+import express from 'express';
 const router = express.Router();
 
-router.get('/', programController.getAllPrograms);
-router.get('/:id', programController.getProgramById);
+router.get('/', (req, res) => {
+    res.send('List of programs');
+});
 
-module.exports = router;
+export default router;
